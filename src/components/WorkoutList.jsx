@@ -24,8 +24,21 @@ export default function WorkoutList({ search }) {
     }
   };
 
+  const filteredWorkout =
+  selectedCategory === 'All'
+    ? WorkoutData
+    : WorkoutData.filter(
+        (item) =>
+          item.level === selectedCategory
+      );
+
   return (
-    <View style={{ flex: 1 }}>
+      <View
+        style={{
+          flex: 1,
+          paddingBottom: 100,
+        }}
+      >
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -54,8 +67,13 @@ export default function WorkoutList({ search }) {
         ))}
       </ScrollView>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {WorkoutData.map((item) => {
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: 140,
+        }}
+      >
+        {filteredWorkout.map((item) => {
           const isFav = favorites.includes(item.id);
 
           return (

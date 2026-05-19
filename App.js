@@ -1,8 +1,18 @@
-import Profile from "./src/screens/Profile";
+import React from "react";
 
-import { fontType } from "./assets/theme";
+import {
+  NavigationContainer,
+} from "@react-navigation/native";
 
-import { useFonts } from "expo-font";
+import Router from "./src/navigation/Router";
+
+import {
+  useFonts,
+} from "expo-font";
+
+import {
+  fontType,
+} from "./assets/theme";
 
 export default function App() {
 
@@ -12,5 +22,9 @@ export default function App() {
     return null;
   }
 
-  return <Profile />;
+  return (
+    <NavigationContainer>
+      <Router />
+    </NavigationContainer>
+  );
 }

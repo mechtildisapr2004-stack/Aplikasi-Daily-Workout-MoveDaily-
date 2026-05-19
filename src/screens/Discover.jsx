@@ -17,9 +17,12 @@ const Discover = () => {
   return (
     <SafeAreaView style={styles.container}>
 
-      <ScrollView
+    <ScrollView
         showsVerticalScrollIndicator={false}
-      >
+        contentContainerStyle={{
+            paddingBottom: 120,
+    }}
+    >
 
         <View style={styles.header}>
           <Text style={styles.title}>

@@ -9,10 +9,22 @@ import {
 } from 'react-native';
 
 import { Heart } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const ItemWorkout = ({ item, isFav, onPress }) => {
+const navigation = useNavigation();
   return (
-    <View style={styles.card}>
+    <TouchableOpacity
+  style={styles.card}
+  onPress={() =>
+    navigation.navigate(
+      'WorkoutDetail',
+      {
+        workoutId: item.id,
+      }
+    )
+  }
+>
       <Image source={item.image} style={styles.image} />
 
       <TouchableOpacity
@@ -32,7 +44,7 @@ const ItemWorkout = ({ item, isFav, onPress }) => {
 
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.duration}>{item.duration}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
