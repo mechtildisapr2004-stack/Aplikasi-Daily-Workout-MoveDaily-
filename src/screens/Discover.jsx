@@ -5,13 +5,16 @@ import {
   Text,
   View,
   Animated,
+  Pressable,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import WorkoutList from "../components/WorkoutList";
 import { colors } from "../../assets/theme";
+import { useNavigation } from "@react-navigation/native";
 
 const Discover = () => {
+  const navigation = useNavigation();
   const scrollY = useRef(
   new Animated.Value(0)
   ).current;
@@ -61,6 +64,21 @@ const Discover = () => {
           <Text style={styles.subtitle}>
             Explore your favorite workout
           </Text>
+
+          <Pressable
+            onPress={() =>
+              navigation.navigate("AddWorkoutPlan")
+            }
+
+            style={styles.searchButton}
+          >
+
+            <Text style={styles.searchText}>
+              Search workout...
+            </Text>
+
+          </Pressable>
+
         </View>
 
         <Animated.View
@@ -119,5 +137,18 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingHorizontal: 24,
     paddingTop: 20,
+  },
+
+  searchButton: {
+    backgroundColor: "#F3F4F6",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    marginTop: 18,
+  },
+
+  searchText: {
+    color: "#9CA3AF",
+    fontFamily: "Pjs-Regular",
   },
 });

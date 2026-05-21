@@ -19,6 +19,11 @@ import Home from "../screens/Home";
 import Discover from "../screens/Discover";
 import Profile from "../screens/Profile";
 import WorkoutDetail from "../screens/WorkoutDetail";
+import Search from "../screens/Search";
+import AddWorkoutPlan from "../screens/AddWorkoutPlan";
+import SplashScreen from "../screens/SplashScreen";
+import Login from "../screens/Login";
+import Register from "../screens/Register";
 
 import { colors } from "../../assets/theme";
 
@@ -33,11 +38,11 @@ function MainApp() {
         tabBarInactiveTintColor: colors.grey(),
 
         tabBarStyle: {
-  height: 100,
-  paddingBottom: 10,
-  paddingTop: 10,
-  position: "absolute",
-},
+          height: 100,
+          paddingBottom: 10,
+          paddingTop: 10,
+          position: "absolute",
+        },
 
         tabBarLabelStyle: {
           fontSize: 11,
@@ -88,7 +93,9 @@ function MainApp() {
 
 const Router = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      initialRouteName="Splash"
+    >
 
       <Stack.Screen
         name="MainApp"
@@ -111,6 +118,46 @@ const Router = () => {
           gestureDirection: "horizontal",
 
           ...TransitionPresets.SlideFromRightIOS,
+        }}
+      />
+
+      <Stack.Screen
+        name="SearchPage"
+        component={Search}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="AddWorkoutPlan"
+        component={AddWorkoutPlan}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="Splash"
+        component={SplashScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="Login"
+        component={Login}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="Register"
+        component={Register}
+        options={{
+          headerShown: false,
         }}
       />
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 import {
   StyleSheet,
- Text,
+  Text,
   View,
   Image,
 } from 'react-native';
