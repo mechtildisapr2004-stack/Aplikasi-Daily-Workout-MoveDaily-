@@ -1,4 +1,8 @@
-import React, { useRef, } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useState,
+} from "react";
 
 import {
   StyleSheet,
@@ -7,12 +11,23 @@ import {
   Image,
   TouchableOpacity,
   Animated,
+  Alert,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ArrowLeft, MoreVertical, Share2 } from "lucide-react-native";
-import { useNavigation } from "@react-navigation/native";
-import { WorkoutData } from "../data/workouts";
+
+import {
+  ArrowLeft,
+  Trash2,
+  Pencil,
+} from "lucide-react-native";
+
+import {
+  useNavigation,
+} from "@react-navigation/native";
+
+import axios from "axios";
+
 import { colors } from "../../assets/theme";
 
 const WorkoutDetail = ({ route }) => {
@@ -21,20 +36,20 @@ const WorkoutDetail = ({ route }) => {
 
   const navigation = useNavigation();
 
-  const selectedWorkout = WorkoutData.find(
-    (item) => item.id === workoutId
-  );
-
-  if (!selectedWorkout) {
-    return null;
-  }
+  const [selectedWorkout,
+    setSelectedWorkout] =
+    useState(null);
 
   const scrollY = useRef(
     new Animated.Value(0)
   ).current;
 
   const diffClampY =
-  Animated.diffClamp(scrollY, 0, 60);
+    Animated.diffClamp(
+      scrollY,
+      0,
+      60
+    );
 
   const headerY =
     diffClampY.interpolate({
@@ -48,8 +63,105 @@ const WorkoutDetail = ({ route }) => {
       outputRange: [0, 140],
     });
 
+  const getWorkoutDetail =
+    async () => {
+
+      try {
+
+        const response =
+          await axios.get(
+            `https://6a0f5bd21736097c360b86ab.mockapi.io/workout/${workoutId}`
+          );
+
+        setSelectedWorkout(
+          response.data
+        );
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+    };
+
+  useEffect(() => {
+
+    getWorkoutDetail();
+
+  }, []);
+
+  const handleDelete =
+    () => {
+
+      Alert.alert(
+        "Delete Workout",
+        "Are you sure you want to delete this workout?",
+
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+
+          {
+            text: "Delete",
+
+            style: "destructive",
+
+            onPress: async () => {
+
+              try {
+
+                await axios.delete(
+                  `https://6a0f5bd21736097c360b86ab.mockapi.io/workout/${workoutId}`
+                );
+
+                Alert.alert(
+                  "Success",
+                  "Workout deleted successfully"
+                );
+
+                navigation.goBack();
+
+              } catch (error) {
+
+                console.log(error);
+
+                Alert.alert(
+                  "Error",
+                  "Failed to delete workout"
+                );
+              }
+            },
+          },
+        ]
+      );
+    };
+
+  if (!selectedWorkout) {
+
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+
+        <Text>
+          Loading...
+        </Text>
+
+      </View>
+    );
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
+
+    <SafeAreaView
+      style={styles.container}
+    >
 
       <Animated.View
         style={[
@@ -63,44 +175,72 @@ const WorkoutDetail = ({ route }) => {
           },
         ]}
       >
-        <View style={styles.headerContent}>
 
-  <TouchableOpacity
-    onPress={() => navigation.goBack()}
-  >
-    <ArrowLeft
-      size={24}
-      color={colors.black()}
-    />
-  </TouchableOpacity>
+        <View
+          style={styles.headerContent}
+        >
 
-  <View style={styles.headerRight}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.goBack()
+            }
+          >
 
-    <TouchableOpacity>
-      <Share2
-        size={22}
-        color={colors.black()}
-      />
-    </TouchableOpacity>
+            <ArrowLeft
+              size={24}
+              color={colors.black()}
+            />
 
-    <TouchableOpacity
-      style={{ marginLeft: 16 }}
-    >
-      <MoreVertical
-        size={22}
-        color={colors.black()}
-      />
-    </TouchableOpacity>
+          </TouchableOpacity>
 
-  </View>
+          <View
+            style={styles.headerRight}
+          >
 
-</View>
+            <TouchableOpacity
+
+              onPress={() =>
+                navigation.navigate(
+                  "AddWorkoutPlan",
+                  {
+                    workout:
+                      selectedWorkout,
+                  }
+                )
+              }
+            >
+
+              <Pencil
+                size={22}
+                color={colors.black()}
+              />
+
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{ marginLeft: 16 }}
+
+              onPress={handleDelete}
+            >
+
+              <Trash2
+                size={22}
+                color="red"
+              />
+
+            </TouchableOpacity>
+
+          </View>
+
+        </View>
 
       </Animated.View>
 
       <Animated.ScrollView
 
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={
+          false
+        }
 
         onScroll={Animated.event(
           [
@@ -124,7 +264,10 @@ const WorkoutDetail = ({ route }) => {
       >
 
         <Image
-          source={selectedWorkout.image}
+          source={{
+            uri: selectedWorkout.image,
+          }}
+
           style={styles.image}
         />
 
@@ -139,10 +282,14 @@ const WorkoutDetail = ({ route }) => {
           </Text>
 
           <Text style={styles.info}>
-            {selectedWorkout.duration} • {selectedWorkout.calories}
+            {selectedWorkout.duration}
+            {" • "}
+            {selectedWorkout.calories}
           </Text>
 
-          <Text style={styles.description}>
+          <Text
+            style={styles.description}
+          >
             {selectedWorkout.description}
           </Text>
 
@@ -156,7 +303,8 @@ const WorkoutDetail = ({ route }) => {
           {
             transform: [
               {
-                translateY: bottomBarY,
+                translateY:
+                  bottomBarY,
               },
             ],
           },
@@ -176,6 +324,7 @@ const WorkoutDetail = ({ route }) => {
 export default WorkoutDetail;
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     backgroundColor: colors.white(),
@@ -184,13 +333,31 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 24,
     paddingTop: 45,
-    paddingButtom: 14,
+    paddingBottom: 14,
+
     position: "absolute",
+
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 1000, 
-    backgroundColor: colors.white(),
+
+    zIndex: 1000,
+
+    backgroundColor:
+      colors.white(),
+  },
+
+  headerContent: {
+    flexDirection: "row",
+    justifyContent:
+      "space-between",
+
+    alignItems: "center",
+  },
+
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 
   image: {
@@ -231,14 +398,22 @@ const styles = StyleSheet.create({
 
   bottomBar: {
     position: "absolute",
+
     bottom: 40,
     left: 20,
     right: 20,
-    backgroundColor: colors.blue(),
+
+    backgroundColor:
+      colors.blue(),
+
     paddingVertical: 18,
+
     borderRadius: 20,
+
     alignItems: "center",
+
     zIndex: 1000,
+
     elevation: 10,
   },
 
@@ -248,14 +423,4 @@ const styles = StyleSheet.create({
     fontFamily: "Pjs-Bold",
   },
 
-  headerContent: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
 });

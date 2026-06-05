@@ -67,7 +67,7 @@ const Discover = () => {
 
           <Pressable
             onPress={() =>
-              navigation.navigate("AddWorkoutPlan")
+              navigation.navigate("SearchPage")
             }
 
             style={styles.searchButton}

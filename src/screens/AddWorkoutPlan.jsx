@@ -28,139 +28,225 @@ import {
   colors,
 } from "../../assets/theme";
 
-const AddWorkoutPlan = () => {
+import axios from "axios";
 
-  const navigation = useNavigation();
+const AddWorkoutPlan =
+  ({ route }) => {
 
-  const [title, setTitle] =
-    useState("");
+    const navigation =
+      useNavigation();
 
-  const [duration, setDuration] =
-    useState("");
+    const workout =
+      route?.params?.workout;
 
-  const [calories, setCalories] =
-    useState("");
-
-  const [category, setCategory] =
-    useState("");
-
-  const [description, setDescription] =
-    useState("");
-
-  const handleSubmit = () => {
-
-    if (
-      !title ||
-      !duration ||
-      !calories ||
-      !category ||
-      !description
-    ) {
-
-      Alert.alert(
-        "Warning",
-        "Please fill all fields"
+    const [title, setTitle] =
+      useState(
+        workout?.title || ""
       );
 
-      return;
-    }
+    const [duration, setDuration] =
+      useState(
+        workout?.duration || ""
+      );
 
-    Alert.alert(
-      "Success",
-      "Workout plan added successfully"
-    );
-  };
+    const [calories, setCalories] =
+      useState(
+        workout?.calories || ""
+      );
 
-  return (
-    <SafeAreaView style={styles.container}>
+    const [category, setCategory] =
+      useState(
+        workout?.category || ""
+      );
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
+    const [description,
+      setDescription] =
+      useState(
+        workout?.description || ""
+      );
+
+    const [image, setImage] =
+      useState(
+        workout?.image || ""
+      );
+
+    const handleSubmit =
+      async () => {
+
+        if (
+          !title ||
+          !duration ||
+          !calories ||
+          !category ||
+          !description ||
+          !image
+        ) {
+
+          Alert.alert(
+            "Warning",
+            "Please fill all fields"
+          );
+
+          return;
+        }
+
+        try {
+
+          if (workout) {
+
+            await axios.put(
+              `https://6a0f5bd21736097c360b86ab.mockapi.io/workout/${workout.id}`,
+              {
+                title,
+                duration,
+                calories,
+                category,
+                image,
+                description,
+              }
+            );
+
+          } else {
+
+            await axios.post(
+              "https://6a0f5bd21736097c360b86ab.mockapi.io/workout",
+              {
+                title,
+                duration,
+                calories,
+                category,
+                image,
+                description,
+              }
+            );
+          }
+
+          Alert.alert(
+            "Success",
+            "Workout added successfully"
+          );
+
+          navigation.goBack();
+
+        } catch (error) {
+
+          console.log(error);
+
+          Alert.alert(
+            "Error",
+            "Failed to add workout"
+          );
+        }
+      };
+
+    return (
+
+      <SafeAreaView
+        style={styles.container}
       >
 
-        <View style={styles.header}>
-
-          <TouchableOpacity
-            onPress={() =>
-              navigation.goBack()
-            }
-          >
-            <ArrowLeft
-              size={24}
-              color={colors.black()}
-            />
-          </TouchableOpacity>
-
-          <Text style={styles.headerTitle}>
-            Add Workout Plan
-          </Text>
-
-        </View>
-
-        <TextInput
-          placeholder="Workout title"
-          placeholderTextColor="#9CA3AF"
-          value={title}
-          onChangeText={setTitle}
-          style={styles.input}
-        />
-
-        <TextInput
-          placeholder="Duration"
-          placeholderTextColor="#9CA3AF"
-          value={duration}
-          onChangeText={setDuration}
-          keyboardType="numeric"
-          style={styles.input}
-        />
-
-        <TextInput
-          placeholder="Calories"
-          placeholderTextColor="#9CA3AF"
-          value={calories}
-          onChangeText={setCalories}
-          keyboardType="numeric"
-          style={styles.input}
-        />
-
-        <TextInput
-          placeholder="Category"
-          placeholderTextColor="#9CA3AF"
-          value={category}
-          onChangeText={setCategory}
-          style={styles.input}
-        />
-
-        <TextInput
-          placeholder="Description"
-          placeholderTextColor="#9CA3AF"
-          value={description}
-          onChangeText={setDescription}
-          multiline
-          numberOfLines={5}
-          style={styles.descriptionInput}
-        />
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleSubmit}
+        <ScrollView
+          showsVerticalScrollIndicator={
+            false
+          }
         >
 
-          <Text style={styles.buttonText}>
-            Save Workout
-          </Text>
+          <View style={styles.header}>
 
-        </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.goBack()
+              }
+            >
 
-      </ScrollView>
+              <ArrowLeft
+                size={24}
+                color={colors.black()}
+              />
 
-    </SafeAreaView>
-  );
-};
+            </TouchableOpacity>
+
+            <Text
+              style={styles.headerTitle}
+            >
+              Add Workout Plan
+            </Text>
+
+          </View>
+
+          <TextInput
+            placeholder="Workout title"
+            placeholderTextColor="#9CA3AF"
+            value={title}
+            onChangeText={setTitle}
+            style={styles.input}
+          />
+
+          <TextInput
+            placeholder="Duration"
+            placeholderTextColor="#9CA3AF"
+            value={duration}
+            onChangeText={setDuration}
+            keyboardType="numeric"
+            style={styles.input}
+          />
+
+          <TextInput
+            placeholder="Calories"
+            placeholderTextColor="#9CA3AF"
+            value={calories}
+            onChangeText={setCalories}
+            keyboardType="numeric"
+            style={styles.input}
+          />
+
+          <TextInput
+            placeholder="Category (Easy / Medium / Hard)"
+            placeholderTextColor="#9CA3AF"
+            value={category}
+            onChangeText={setCategory}
+            style={styles.input}
+          />
+
+          <TextInput
+            placeholder="Image URL"
+            placeholderTextColor="#9CA3AF"
+            value={image}
+            onChangeText={setImage}
+            style={styles.input}
+          />
+
+          <TextInput
+            placeholder="Description"
+            placeholderTextColor="#9CA3AF"
+            value={description}
+            onChangeText={setDescription}
+            multiline
+            numberOfLines={5}
+            style={styles.descriptionInput}
+          />
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSubmit}
+          >
+
+            <Text style={styles.buttonText}>
+              Save Workout
+            </Text>
+
+          </TouchableOpacity>
+
+        </ScrollView>
+
+      </SafeAreaView>
+    );
+  };
 
 export default AddWorkoutPlan;
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     backgroundColor: colors.white(),
@@ -214,4 +300,5 @@ const styles = StyleSheet.create({
     fontFamily: "Pjs-Bold",
     fontSize: 16,
   },
+
 });

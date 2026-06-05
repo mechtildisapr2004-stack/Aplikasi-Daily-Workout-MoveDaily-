@@ -25,6 +25,7 @@ import SplashScreen from "../screens/SplashScreen";
 import Login from "../screens/Login";
 import Register from "../screens/Register";
 
+
 import { colors } from "../../assets/theme";
 
 const Tab = createBottomTabNavigator();

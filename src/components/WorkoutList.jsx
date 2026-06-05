@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, {
+  useState,
+  useEffect,
+} from "react";
 
 import {
   View,
@@ -6,86 +9,175 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-} from 'react-native';
+} from "react-native";
 
-import ItemWorkout from './ItemWorkout';
-import { WorkoutData } from '../data/workouts';
-import { CategoryList } from '../data/categories';
+import axios from "axios";
 
-export default function WorkoutList({ search }) {
-  const [favorites, setFavorites] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('All');
+import ItemWorkout from "./ItemWorkout";
+
+import {
+  CategoryList,
+} from "../data/categories";
+
+import {
+  useFocusEffect,
+} from "@react-navigation/native";
+
+export default function WorkoutList() {
+
+  const [favorites,
+    setFavorites] = useState([]);
+
+  const [selectedCategory,
+    setSelectedCategory] =
+    useState("All");
+
+  const [workoutData,
+    setWorkoutData] = useState([]);
 
   const toggleFavorite = (id) => {
+
     if (favorites.includes(id)) {
-      setFavorites(favorites.filter((item) => item !== id));
+
+      setFavorites(
+        favorites.filter(
+          (item) => item !== id
+        )
+      );
+
     } else {
-      setFavorites([...favorites, id]);
+
+      setFavorites([
+        ...favorites,
+        id,
+      ]);
     }
   };
 
+  const getWorkoutData =
+    async () => {
+
+      try {
+
+        const response =
+          await axios.get(
+            "https://6a0f5bd21736097c360b86ab.mockapi.io/workout"
+          );
+
+        setWorkoutData(
+          response.data
+        );
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+    };
+
+  useFocusEffect(
+    React.useCallback(() => {
+
+      getWorkoutData();
+
+    }, [])
+  );
+
   const filteredWorkout =
-  selectedCategory === 'All'
-    ? WorkoutData
-    : WorkoutData.filter(
+    selectedCategory === "All"
+      ? workoutData
+      : workoutData.filter(
         (item) =>
-          item.level === selectedCategory
+          item.category ===
+          selectedCategory
       );
 
   return (
-      <View
-        style={{
-          flex: 1,
-          paddingBottom: 100,
-        }}
-      >
+    <View
+      style={{
+        flex: 1,
+        paddingBottom: 100,
+      }}
+    >
+
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.categoryWrapper}
       >
+
         {CategoryList.map((item) => (
+
           <TouchableOpacity
             key={item.id}
-            onPress={() => setSelectedCategory(item.categoryName)}
+
+            onPress={() =>
+              setSelectedCategory(
+                item.categoryName
+              )
+            }
+
             style={[
               styles.categoryButton,
-              selectedCategory === item.categoryName &&
-                styles.activeCategory,
+
+              selectedCategory ===
+              item.categoryName &&
+
+              styles.activeCategory,
             ]}
           >
+
             <Text
               style={[
                 styles.categoryText,
-                selectedCategory === item.categoryName &&
-                  styles.activeText,
+
+                selectedCategory ===
+                item.categoryName &&
+
+                styles.activeText,
               ]}
             >
+
               {item.categoryName}
+
             </Text>
+
           </TouchableOpacity>
+
         ))}
+
       </ScrollView>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
+
         contentContainerStyle={{
           paddingBottom: 140,
         }}
       >
+
         {filteredWorkout.map((item) => {
-          const isFav = favorites.includes(item.id);
+
+          const isFav =
+            favorites.includes(item.id);
 
           return (
             <ItemWorkout
               key={item.id}
+
               item={item}
+
               isFav={isFav}
-              onPress={() => toggleFavorite(item.id)}
+
+              onPress={() =>
+                toggleFavorite(item.id)
+              }
             />
           );
         })}
+
       </ScrollView>
+
     </View>
   );
 }
@@ -96,23 +188,28 @@ const styles = StyleSheet.create({
   },
 
   categoryButton: {
-    backgroundColor: '#E5E7EB',
+    backgroundColor: "#E5E7EB",
+
     paddingHorizontal: 16,
+
     paddingVertical: 8,
+
     borderRadius: 20,
+
     marginRight: 10,
   },
 
   activeCategory: {
-    backgroundColor: '#111827',
+    backgroundColor: "#111827",
   },
 
   categoryText: {
-    color: '#000',
-    fontWeight: '600',
+    color: "#000",
+
+    fontWeight: "600",
   },
 
   activeText: {
-    color: '#fff',
+    color: "#fff",
   },
 });

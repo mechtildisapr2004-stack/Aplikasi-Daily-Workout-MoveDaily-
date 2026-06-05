@@ -25,7 +25,11 @@ const navigation = useNavigation();
     )
   }
 >
-      <Image source={item.image} style={styles.image} />
+      <Image
+        source={{
+          uri: item.image,
+        }} style={styles.image} 
+      />
 
       <TouchableOpacity
         style={styles.favBtn}
@@ -39,7 +43,7 @@ const navigation = useNavigation();
       </TouchableOpacity>
 
       <View style={styles.badge}>
-        <Text style={styles.badgeText}>{item.level}</Text>
+        <Text style={styles.badgeText}>{item.category}</Text>
       </View>
 
       <Text style={styles.title}>{item.title}</Text>

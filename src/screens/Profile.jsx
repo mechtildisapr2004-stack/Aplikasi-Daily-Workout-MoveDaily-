@@ -1,74 +1,153 @@
-import React from 'react';
+import React from "react";
 
 import {
-  StyleSheet,
-  Text,
   View,
+  Text,
+  StyleSheet,
   Image,
-} from 'react-native';
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+} from "react-native-safe-area-context";
 
-import { ProfileData } from '../data/profiledata';
+import {
+  useNavigation,
+} from "@react-navigation/native";
 
-import { colors } from '../../assets/theme';
+import {
+  Plus,
+} from "lucide-react-native";
+
+import {
+  colors,
+} from "../../assets/theme";
 
 const Profile = () => {
+
+  const navigation =
+    useNavigation();
+
   return (
-    <SafeAreaView style={styles.container}>
 
-      <View style={styles.profileContainer}>
+    <SafeAreaView
+      style={styles.container}
+    >
 
-        <Image
-          source={{
-            uri: ProfileData.profilePict,
-          }}
-          style={styles.image}
-        />
+      <ScrollView
+        showsVerticalScrollIndicator={
+          false
+        }
+      >
 
-        <Text style={styles.name}>
-          {ProfileData.name}
-        </Text>
+        <View style={styles.profileContainer}>
 
-        <Text style={styles.info}>
-          Member since {ProfileData.createdAt}
-        </Text>
+          <Image
+            source={{
+              uri: "https://i.pravatar.cc/300",
+            }}
 
-        <View style={styles.statsContainer}>
+            style={styles.profileImage}
+          />
 
-          <View style={styles.statsBox}>
-            <Text style={styles.number}>
-              {ProfileData.totalWorkout}
+          <Text style={styles.name}>
+            MoveDaily User
+          </Text>
+
+          <Text style={styles.email}>
+            movedaily@gmail.com
+          </Text>
+
+        </View>
+
+        <View style={styles.statsWrapper}>
+
+          <View style={styles.statsCard}>
+
+            <Text style={styles.statsNumber}>
+              12
             </Text>
 
-            <Text style={styles.label}>
-              Workout
+            <Text style={styles.statsLabel}>
+              Workouts
             </Text>
+
           </View>
 
-          <View style={styles.statsBox}>
-            <Text style={styles.number}>
-              {ProfileData.totalSteps}
+          <View style={styles.statsCard}>
+
+            <Text style={styles.statsNumber}>
+              8
             </Text>
 
-            <Text style={styles.label}>
-              Steps
+            <Text style={styles.statsLabel}>
+              Completed
             </Text>
+
           </View>
 
-          <View style={styles.statsBox}>
-            <Text style={styles.number}>
-              {ProfileData.calories}
+          <View style={styles.statsCard}>
+
+            <Text style={styles.statsNumber}>
+              540
             </Text>
 
-            <Text style={styles.label}>
+            <Text style={styles.statsLabel}>
               Calories
             </Text>
+
           </View>
 
         </View>
 
-      </View>
+        <View style={styles.card}>
+
+          <Text style={styles.cardTitle}>
+            Daily Motivation 🔥
+          </Text>
+
+          <Text style={styles.cardText}>
+            Keep pushing yourself and
+            stay consistent with your
+            fitness journey every day.
+          </Text>
+
+        </View>
+
+        <View style={styles.card}>
+
+          <Text style={styles.cardTitle}>
+            Workout Plan
+          </Text>
+
+          <Text style={styles.cardText}>
+            Create your own custom
+            workout plans easily using
+            the add workout feature.
+          </Text>
+
+        </View>
+
+      </ScrollView>
+
+      <TouchableOpacity
+        style={styles.addButton}
+
+        onPress={() =>
+          navigation.navigate(
+            "AddWorkoutPlan"
+          )
+        }
+      >
+
+        <Plus
+          color="#fff"
+          size={30}
+        />
+
+      </TouchableOpacity>
 
     </SafeAreaView>
   );
@@ -77,17 +156,19 @@ const Profile = () => {
 export default Profile;
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     backgroundColor: colors.white(),
+    paddingHorizontal: 24,
   },
 
   profileContainer: {
-    alignItems: 'center',
-    paddingTop: 60,
+    alignItems: "center",
+    marginTop: 30,
   },
 
-  image: {
+  profileImage: {
     width: 120,
     height: 120,
     borderRadius: 60,
@@ -95,41 +176,82 @@ const styles = StyleSheet.create({
 
   name: {
     fontSize: 24,
-    fontFamily: 'Pjs-Bold',
-    marginTop: 15,
+    marginTop: 18,
+    fontFamily: "Pjs-Bold",
     color: colors.black(),
   },
 
-  info: {
-    fontSize: 14,
+  email: {
+    marginTop: 8,
     color: colors.grey(),
-    marginBottom: 25,
-    fontFamily: 'Pjs-Regular',
+    fontFamily: "Pjs-Regular",
   },
 
-  statsContainer: {
-    flexDirection: 'row',
-    gap: 15,
+  statsWrapper: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 35,
   },
 
-  statsBox: {
-    backgroundColor: colors.blue(),
-    padding: 20,
+  statsCard: {
+    backgroundColor: "#F3F4F6",
+    width: "31%",
+    paddingVertical: 20,
     borderRadius: 20,
-    width: 90,
-    alignItems: 'center',
+    alignItems: "center",
   },
 
-  number: {
-    color: colors.white(),
-    fontSize: 18,
-    fontFamily: 'Pjs-Bold',
+  statsNumber: {
+    fontSize: 22,
+    fontFamily: "Pjs-Bold",
+    color: colors.blue(),
   },
 
-  label: {
-    color: colors.white(),
+  statsLabel: {
+    marginTop: 8,
+    color: colors.grey(),
+    fontFamily: "Pjs-Regular",
     fontSize: 12,
-    marginTop: 5,
-    fontFamily: 'Pjs-Regular',
   },
+
+  card: {
+    backgroundColor: "#F3F4F6",
+    padding: 22,
+    borderRadius: 22,
+    marginTop: 24,
+  },
+
+  cardTitle: {
+    fontSize: 18,
+    fontFamily: "Pjs-Bold",
+    color: colors.black(),
+  },
+
+  cardText: {
+    marginTop: 10,
+    lineHeight: 22,
+    color: colors.grey(),
+    fontFamily: "Pjs-Regular",
+  },
+
+  addButton: {
+    position: "absolute",
+
+    bottom: 120,
+    right: 24,
+
+    width: 70,
+    height: 70,
+
+    borderRadius: 35,
+
+    backgroundColor:
+      colors.blue(),
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    elevation: 10,
+  },
+
 });
