@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Image,
 } from "react-native";
 
 import {
@@ -28,7 +29,16 @@ import {
   colors,
 } from "../../assets/theme";
 
-import axios from "axios";
+import { supabase }
+  from "../libs/supabase";
+
+import * as ImagePicker
+  from "expo-image-picker";
+
+import * as FileSystem
+  from "expo-file-system/legacy";
+
+import "react-native-url-polyfill/auto";
 
 const AddWorkoutPlan =
   ({ route }) => {
@@ -92,38 +102,88 @@ const AddWorkoutPlan =
 
         try {
 
+          let imageUrl =
+            image;
+
+          if (
+            image.startsWith(
+              "file://"
+            )
+          ) {
+
+            const uploadedUrl =
+              await uploadImage(
+                image
+              );
+
+            if (
+              !uploadedUrl
+            ) {
+
+              Alert.alert(
+                "Error",
+                "Failed to upload image"
+              );
+
+              return;
+            }
+
+            imageUrl =
+              uploadedUrl;
+          }
+
           if (workout) {
 
-            await axios.put(
-              `https://6a0f5bd21736097c360b86ab.mockapi.io/workout/${workout.id}`,
-              {
-                title,
-                duration,
-                calories,
-                category,
-                image,
-                description,
-              }
-            );
+            const { error } =
+              await supabase
+                .from(
+                  "workouts"
+                )
+                .update({
+                  title,
+                  duration,
+                  calories,
+                  category,
+                  image:
+                    imageUrl,
+                  description,
+                })
+                .eq(
+                  "id",
+                  workout.id
+                );
+
+            if (error)
+              throw error;
 
           } else {
 
-            await axios.post(
-              "https://6a0f5bd21736097c360b86ab.mockapi.io/workout",
-              {
-                title,
-                duration,
-                calories,
-                category,
-                image,
-                description,
-              }
-            );
+            const { error } =
+              await supabase
+                .from(
+                  "workouts"
+                )
+                .insert([
+                  {
+                    title,
+                    duration,
+                    calories,
+                    category,
+                    image:
+                      imageUrl,
+                    description,
+                  },
+                ]);
+
+            if (error)
+              throw error;
           }
 
           Alert.alert(
             "Success",
-            "Workout added successfully"
+            workout
+              ? "Workout updated successfully"
+              : "Workout added successfully"
           );
 
           navigation.goBack();
@@ -134,8 +194,106 @@ const AddWorkoutPlan =
 
           Alert.alert(
             "Error",
-            "Failed to add workout"
+            workout
+              ? "Failed to update workout"
+              : "Failed to add workout"
           );
+        }
+      };
+
+    const pickImage =
+      async () => {
+
+        const result =
+          await ImagePicker
+            .launchImageLibraryAsync({
+              mediaTypes:
+                ["images"],
+
+              allowsEditing: true,
+
+              quality: 1,
+            });
+
+        if (
+          !result.canceled
+        ) {
+
+          setImage(
+            result.assets[0].uri
+          );
+        }
+      };
+
+    const uploadImage =
+      async (uri) => {
+
+        try {
+
+          const fileName =
+            `${Date.now()}.jpg`;
+
+          const base64 =
+            await FileSystem
+              .readAsStringAsync(
+                uri,
+                {
+                  encoding: "base64",
+                }
+              );
+
+          const arrayBuffer =
+            Uint8Array.from(
+              atob(base64),
+              (c) =>
+                c.charCodeAt(0)
+            );
+
+          const { error } =
+            await supabase
+              .storage
+              .from(
+                "workout-images"
+              )
+              .upload(
+                fileName,
+                arrayBuffer,
+                {
+                  contentType:
+                    "image/jpeg",
+                  upsert: true,
+                }
+              );
+
+          if (error)
+            throw error;
+
+          const {
+            data,
+          } = supabase
+            .storage
+            .from(
+              "workout-images"
+            )
+            .getPublicUrl(
+              fileName
+            );
+
+          return data.publicUrl;
+
+        } catch (error) {
+
+          console.log(
+            "UPLOAD ERROR:",
+            error
+          );
+
+          Alert.alert(
+            "Upload Error",
+            error.message
+          );
+
+          return null;
         }
       };
 
@@ -208,13 +366,39 @@ const AddWorkoutPlan =
             style={styles.input}
           />
 
-          <TextInput
-            placeholder="Image URL"
-            placeholderTextColor="#9CA3AF"
-            value={image}
-            onChangeText={setImage}
+          <TouchableOpacity
             style={styles.input}
-          />
+            onPress={pickImage}
+          >
+
+            <Text>
+
+              {image
+                ? "Image Selected ✅"
+                : "Choose Image"}
+
+            </Text>
+
+          </TouchableOpacity>
+
+          {
+            image !== "" && (
+
+              <Image
+                source={{
+                  uri: image,
+                }}
+
+                style={{
+                  width: "100%",
+                  height: 200,
+                  borderRadius: 15,
+                  marginTop: 15,
+                }}
+              />
+
+            )
+          }
 
           <TextInput
             placeholder="Description"

@@ -26,7 +26,8 @@ import {
   useNavigation,
 } from "@react-navigation/native";
 
-import axios from "axios";
+import { supabase }
+  from "../libs/supabase";
 
 import { colors } from "../../assets/theme";
 
@@ -68,13 +69,23 @@ const WorkoutDetail = ({ route }) => {
 
       try {
 
-        const response =
-          await axios.get(
-            `https://6a0f5bd21736097c360b86ab.mockapi.io/workout/${workoutId}`
-          );
+        const {
+          data,
+          error,
+        } = await supabase
+          .from("workouts")
+          .select("*")
+          .eq(
+            "id",
+            workoutId
+          )
+          .single();
+
+        if (error)
+          throw error;
 
         setSelectedWorkout(
-          response.data
+          data
         );
 
       } catch (error) {
@@ -112,9 +123,17 @@ const WorkoutDetail = ({ route }) => {
 
               try {
 
-                await axios.delete(
-                  `https://6a0f5bd21736097c360b86ab.mockapi.io/workout/${workoutId}`
-                );
+                const { error } =
+                  await supabase
+                    .from("workouts")
+                    .delete()
+                    .eq(
+                      "id",
+                      Number(workoutId)
+                    );
+
+                if (error)
+                  throw error;
 
                 Alert.alert(
                   "Success",

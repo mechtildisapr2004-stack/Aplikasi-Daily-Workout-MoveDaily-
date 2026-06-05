@@ -25,6 +25,9 @@ import {
   colors,
 } from "../../assets/theme";
 
+import { supabase }
+  from "../libs/supabase";
+
 const Register = ({ navigation }) => {
 
   const [fullname, setFullname] =
@@ -44,7 +47,8 @@ const Register = ({ navigation }) => {
     setShowPassword] =
     useState(false);
 
-  const handleRegister = () => {
+  const handleRegister =
+  async () => {
 
     if (
       !fullname ||
@@ -61,7 +65,10 @@ const Register = ({ navigation }) => {
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (
+      password !==
+      confirmPassword
+    ) {
 
       Alert.alert(
         "Warning",
@@ -71,17 +78,46 @@ const Register = ({ navigation }) => {
       return;
     }
 
-    Alert.alert(
-      "Success",
-      "Welcome to MoveDaily!",
-      [
-        {
-          text: "OK",
-          onPress: () =>
-            navigation.goBack(),
-        },
-      ]
-    );
+    try {
+
+      const {
+        data,
+        error,
+      } =
+        await supabase
+          .auth
+          .signUp({
+            email,
+            password,
+            options: {
+              data: {
+                fullname,
+              },
+            },
+          });
+
+      if (error)
+        throw error;
+
+      Alert.alert(
+        "Success",
+        "Account created successfully",
+        [
+          {
+            text: "OK",
+            onPress: () =>
+              navigation.goBack(),
+          },
+        ]
+      );
+
+    } catch (error) {
+
+      Alert.alert(
+        "Register Failed",
+        error.message
+      );
+    }
   };
 
   return (

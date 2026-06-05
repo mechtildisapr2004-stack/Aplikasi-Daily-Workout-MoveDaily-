@@ -24,6 +24,9 @@ import {
   colors,
 } from "../../assets/theme";
 
+import { supabase }
+  from "../libs/supabase";
+
 const Login = ({ navigation }) => {
 
   const [email, setEmail] =
@@ -35,20 +38,49 @@ const Login = ({ navigation }) => {
   const [showPassword, setShowPassword] =
     useState(false);
 
-  const handleLogin = () => {
+  const handleLogin =
+    async () => {
 
-    if (!email || !password) {
+      if (
+        !email ||
+        !password
+      ) {
 
-      Alert.alert(
-        "Warning",
-        "Please fill all fields"
-      );
+        Alert.alert(
+          "Warning",
+          "Please fill all fields"
+        );
 
-      return;
-    }
+        return;
+      }
 
-    navigation.replace("MainApp");
-  };
+      try {
+
+        const {
+          error,
+        } =
+          await supabase
+            .auth
+            .signInWithPassword({
+              email,
+              password,
+            });
+
+        if (error)
+          throw error;
+
+        navigation.replace(
+          "MainApp"
+        );
+
+      } catch (error) {
+
+        Alert.alert(
+          "Login Failed",
+          error.message
+        );
+      }
+    };
 
   return (
     <SafeAreaView style={styles.container}>

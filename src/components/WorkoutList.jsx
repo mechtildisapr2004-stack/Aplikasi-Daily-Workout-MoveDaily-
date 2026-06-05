@@ -11,7 +11,8 @@ import {
   StyleSheet,
 } from "react-native";
 
-import axios from "axios";
+import { supabase }
+  from "../libs/supabase";
 
 import ItemWorkout from "./ItemWorkout";
 
@@ -59,14 +60,21 @@ export default function WorkoutList() {
 
       try {
 
-        const response =
-          await axios.get(
-            "https://6a0f5bd21736097c360b86ab.mockapi.io/workout"
-          );
+        const {
+          data,
+          error,
+        } = await supabase
+          .from("workouts")
+          .select("*");
 
-        setWorkoutData(
-          response.data
-        );
+        if (error) {
+
+          console.log(error);
+
+          return;
+        }
+
+        setWorkoutData(data);
 
       } catch (error) {
 
